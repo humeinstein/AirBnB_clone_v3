@@ -19,7 +19,6 @@ def get_all_amenities():
     amenities = []
     amenvalue = storage.all("Amenity").values()
 
-    
     for need in amenvalue:
         amenities.append(need.to_dict())
     return jsonify(amenities)
@@ -53,7 +52,7 @@ def delete_amenity_by_id(amenity_id):
     storage.delete(amen)
     storage.save()
     return jsonify({}), 200
-    
+
 
 @app_views.route('/amenities',
                  methods=['POST'],

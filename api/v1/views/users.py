@@ -14,7 +14,7 @@ def get_all_users():
     users = []
     usercontent = storage.all("User").values()
 
-    for need in users:
+    for need in usercontent:
         users.append(need.to_dict())
     return jsonify(users)
 
@@ -26,11 +26,12 @@ def get_user_by_id(user_id):
     """
     get user by id
     """
-    try:
-        users = storage.get('User', user_id)
-        return jsonify(users.to_dict())
-    except Exception:
+
+    users = storage.get('User', user_id)
+    if users is None:
         abort(404)
+    else:
+        return jsonify(users.to_dict())
 
 
 @app_views.route('/users/<user_id>',
@@ -40,13 +41,14 @@ def delete_user_by_id(user_id):
     """
     delete user by id
     """
-    try:
-        users = storage.get('User', user_id)
+
+    users = storage.get('User', user_id)
+    if users is None:
+        abort(404)
+    else:
         storage.delete(users)
         storage.save()
         return jsonify({}), 200
-    except Exception:
-        abort(404)
 
 
 @app_views.route('/users',
@@ -59,17 +61,14 @@ def post_user():
 
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
-    if "email" not in request.get_json():
+    credentials = request.get_json()
+    if "email" not in credentials:
         return jsonify({"error": "Missing email"}), 400
-    users = request.get_json()
-
-    if "password" not in request.get_json():
-        return jsonify({"error": "Missing name"}), 400
-
-    newuser = Amenity(**user)
-    newuser.save()
-
-    return jsonify(newamen.to_dict()), 201
+    if "password" not in credentials:
+        return jsonify({"error": "Missing password"}), 400
+    newusers = User(**credentials)
+    newusers.save()
+    return jsonify(users.to_dict()), 201
 
 
 @app_views.route('/users/<user_id>',
@@ -80,12 +79,12 @@ def puts_user(user_id):
     puts user
     """
     users = storage.get('User', user_id)
-    if amenity is None:
+    if users is None:
         abort(404)
-    if request.json is False:
+    if not request.json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(users, key, value)
-    city.save()
+    storage.save()
     return jsonify(user_id.to_dict())
