@@ -51,7 +51,7 @@ def delete_review_by_id(review_id):
                  strict_slashes=False)
 def post_review(place_id):
     """ creates a review object """
-        
+
     test_user = storage.get('User', request.json['user_id'])
     if test_user is None:
         abort(404)
@@ -72,7 +72,7 @@ def post_review(place_id):
         abort(400)
         return jsonify({"error": "Not a JSON"})
     new = Review(**request.get_json())
-    new.save()
+    storage.save()
     return jsonify(new.to_dict()), 201
 
 
@@ -87,7 +87,8 @@ def puts_review(review_id):
     if not request.json:
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
-        if key not in ['id', 'user_id', 'place_id', 'created_at', 'updated_at']:
+        if key not in ['id', 'user_id', 'place_id', 'created_at',
+                       'updated_at']:
             setattr(review, key, value)
-    review.save()
+    storage.save()
     return jsonify(review.to_dict())
