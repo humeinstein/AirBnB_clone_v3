@@ -49,9 +49,10 @@ def delete_amenity_by_id(amenity_id):
     amen = storage.get('Amenity', amenity_id)
     if amen is None:
         abort(404)
-    storage.delete(amen)
-    storage.save()
-    return jsonify({}), 200
+    else:
+        storage.delete(amen)
+        storage.save()
+        return jsonify({}), 200
 
 
 @app_views.route('/amenities',
