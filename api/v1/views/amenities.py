@@ -43,14 +43,14 @@ def delete_amenity_by_id(amenity_id):
     """
     delete amenity by id
     """
-    try:
-        amen = storage.get('Amenity', amenity_id)
-        storage.delete(amen)
-        storage.save()
-        return jsonify({}), 200
-    except Exception:
-        abort(404)
 
+    amen = storage.get('Amenity', amenity_id)
+    if amen is None:
+        abort(404)
+    storage.delete(amen)
+    storage.save()
+    return jsonify({}), 200
+    
 
 @app_views.route('/amenities',
                  methods=['POST'],
@@ -88,5 +88,5 @@ def puts_amenity(amenity_id):
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(amenity, key, value)
-    amenity.save()
-    return jsonify(amenity.to_dict())
+    storage.save()
+    return jsonify(amenity.to_dict()), 200
