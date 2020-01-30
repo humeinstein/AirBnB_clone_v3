@@ -13,6 +13,8 @@ def get_reviews(place_id):
     """ returns list of reviews """
     list_of_reviews = []
     place = storage.get('Place', place_id)
+    if place is None:
+        abort(404)
     for review in storage.all('Review').values():
         if review.place_id == place_id:
             list_of_reviews.append(review.to_dict())
@@ -83,11 +85,11 @@ def puts_review(review_id):
     review = storage.get('Review', review_id)
     if review is None:
         abort(404)
-    if not request.json:
+    if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'user_id', 'place_id', 'created_at',
                        'updated_at']:
             setattr(review, key, value)
     storage.save()
-    return jsonify(review.to_dict())
+    return jsonify(review.to_dict()), 200
