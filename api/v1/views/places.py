@@ -11,6 +11,9 @@ from models.place import Place
                  strict_slashes=False)
 def get_places(city_id):
     """ return list of places """
+    city = storage.get('City', city_id)
+    if city is None:
+        abort(404)
     list_of_places = []
     for place in storage.all('Place').values():
         list_of_places.append(place.to_dict())
@@ -22,11 +25,11 @@ def get_places(city_id):
                  strict_slashes=False)
 def get_place(place_id):
     """ return specific place """
-    try:
-        place = storage.get('Place', place_id)
-        return jsonify(place.to_dict())
-    except Exception:
+    place = storage.get('Place', place_id)
+    if place is None:
         abort(404)
+    else:
+        return jsonify(place.to_dict())
 
 
 @app_views.route('/places/<place_id>',
@@ -34,14 +37,13 @@ def get_place(place_id):
                  strict_slashes=False)
 def delete_place_by_id(place_id):
     """ delete specific place """
-    try:
-        place = storage.get('Place', place_id)
+    place = storage.get('Place', place_id)
+    if place is None:
+        abort(404)
+    else:
         storage.delete(place)
         storage.save()
-        storage.reload()
         return jsonify({}), 200
-    except Exception:
-        abort(404)
 
 
 @app_views.route('cities/<city_id>/places',
