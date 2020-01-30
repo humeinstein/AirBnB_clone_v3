@@ -87,16 +87,21 @@ class TestFileStorage(unittest.TestCase):
     def test_save(self):
         """Test that save properly saves objects to file.json"""
     
-    def count(self, cls=None):
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def tcount(self, cls=None):
         """
         count objects in storage
         """
-        count = 0
-        classes = self.all(cls)
-        count = len(cls)
-        return count
-    def close(self):
+        count = models.storage.count()
+        letsee = City(name="Seattle")
+        letsee.save()
+        self.assertEqual(count + 1, models.storage.count())
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def tget(self):
         """
         close
         """
-        self.__session.close()
+        checks = State(name="New York")
+        checks.save()
+        self.assertEqual(models.storage.get("State", checks.id), checks)

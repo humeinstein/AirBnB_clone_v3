@@ -114,19 +114,13 @@ class TestFileStorage(unittest.TestCase):
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
 
-    def count(self, cls=None):
-        """
-        return count of obj in storage
-        """
-        length = 0
-        if cls is not None:
-            for key in self.__objects:
-                length = length + 1
-        else:
-            if cls is None:
-                for key in self.__objects:
-                    length = length + 1
-        return length
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def tget(self):
+        """ test get """
+        storage = FileStorage()
+        checks = City()
+        checks.save()
+        self.assertEqual(checks, storage.get("City", checks.id))
 
     def close(self):
         """ deserialize """
