@@ -71,8 +71,8 @@ def delete_state_by_id(state_id):
     try:
         state = storage.get('State', state_id)
         storage.delete(state)
-        return jsonify({}), 200
         storage.save()
+        return jsonify({}), 200
     except Exception:
         abort(404)
 
@@ -98,11 +98,9 @@ def post_state():
     ----- jsonify and return new state as dict with success 201
     """
     if 'name' not in request.json:
-        abort(400)
-        return jsonify({"error": "Missing Name"})
+        return jsonify({"error": "Missing Name"}), 400
     if request.json is False:
-        abort(400)
-        return jsonify({"error": "Not a JSON"})
+        return jsonify({"error": "Not a JSON"}), 400
     new = State(**request.get_json())
     new.save()
     return jsonify(new.to_dict()), 201
@@ -137,4 +135,4 @@ def puts_state(state_id):
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(state, key, value)
     state.save()
-    return jsonify(state.to_dict())
+    return jsonify(state.to_dict()), 200
