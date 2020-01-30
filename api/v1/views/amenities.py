@@ -29,11 +29,11 @@ def get_amenity(amenity_id):
     get amenity by id
     """
     
-    try:
-        amen = storage.get('Amenity', amenity_id)
-        return jsonify(amen.to_dict())
-    except Exception:
+    amen = storage.get('Amenity', amenity_id)
+    if amen is None:
         abort(404)
+    return jsonify(amen.to_dict())
+    
 
 
 @app_views.route('/amenities/<amenity_id>',
@@ -88,5 +88,5 @@ def puts_amenity(amenity_id):
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(amenity, key, value)
-    city.save()
+    amenity.save()
     return jsonify(amenity.to_dict())
