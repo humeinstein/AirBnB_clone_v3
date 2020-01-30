@@ -49,7 +49,7 @@ def delete_place_by_id(place_id):
 @app_views.route('cities/<city_id>/places',
                  methods=['POST'],
                  strict_slashes=False)
-def post_place():
+def post_place(city_id):
     """ creates a place """
     if "name" not in request.json:
         abort(400)
