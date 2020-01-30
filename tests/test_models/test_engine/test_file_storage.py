@@ -113,3 +113,21 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    def count(self, cls=None):
+        """
+        return count of obj in storage
+        """
+        length = 0
+        if cls is not None:
+            for key in self.__objects:
+                length = length + 1
+        else:
+            if cls is None:
+                for key in self.__objects:
+                    length = length + 1
+        return length
+
+    def close(self):
+        """ deserialize """
+        self.reload()
