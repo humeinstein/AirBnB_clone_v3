@@ -6,14 +6,16 @@ from models import storage
 from models.review import Review
 
 
-@app_views.route('/reviews',
+@app_views.route('/places/<place_id>/reviews',
                  methods=['GET'],
                  strict_slashes=False)
-def get_reviews():
+def get_reviews(place_id):
     """ returns list of reviews """
-    list_of_reviews = {}
+    list_of_reviews = []
+    place = storage.get('Place', place_id)
     for review in storage.all('Review').values():
-        list_of_reviews.append(review.to_dict())
+        if review.place_id == place_id:
+            list_of_reviews.append(review.to_dict())
     return jsonify(list_of_reviews)
 
 
@@ -44,14 +46,28 @@ def delete_review_by_id(review_id):
         abort(404)
 
 
-@app_views.route('/reviews',
+@app_views.route('/places/<place_id>/reviews',
                  methods=['POST'],
                  strict_slashes=False)
-def post_review():
+def post_review(place_id):
     """ creates a review object """
-    if 'name' not in request.json:
+        
+    test_user = storage.get('User', request.json['user_id'])
+    if test_user is None:
+        abort(404)
+
+    test_place = storage.get('Place', place_id)
+    if test_place is None:
+        abort(404)
+
+    if 'user_id' not in request.json:
         abort(400)
-        return jsonify({"error": "Missing Name"})
+        return jsonify({"error": "Missing user_id"})
+
+    if 'text' not in request.json:
+        abort(400)
+        return jsonify({"error": "Missing text"})
+
     if request.json is False:
         abort(400)
         return jsonify({"error": "Not a JSON"})
@@ -71,7 +87,7 @@ def puts_review(review_id):
     if not request.json:
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
-        if key not in ['id', 'created_at', 'updated_at']:
+        if key not in ['id', 'user_id', 'place_id', 'created_at', 'updated_at']:
             setattr(review, key, value)
     review.save()
     return jsonify(review.to_dict())
