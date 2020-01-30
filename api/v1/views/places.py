@@ -6,7 +6,7 @@ from models import storage
 from models.place import Place
 
 
-@app_views.route('cities/<city_id>/places',
+@app_views.route('/cities/<city_id>/places',
                  methods=['GET'],
                  strict_slashes=False)
 def get_places(city_id):
@@ -16,7 +16,8 @@ def get_places(city_id):
         abort(404)
     list_of_places = []
     for place in storage.all('Place').values():
-        list_of_places.append(place.to_dict())
+        if place.city_id == city_id:
+            list_of_places.append(place.to_dict())
     return jsonify(list_of_places)
 
 
@@ -46,7 +47,7 @@ def delete_place_by_id(place_id):
         return jsonify({}), 200
 
 
-@app_views.route('cities/<city_id>/places',
+@app_views.route('/cities/<city_id>/places',
                  methods=['POST'],
                  strict_slashes=False)
 def post_place(city_id):
