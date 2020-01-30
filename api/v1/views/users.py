@@ -81,10 +81,10 @@ def puts_user(user_id):
     users = storage.get('User', user_id)
     if users is None:
         abort(404)
-    if not request.json():
+    if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(users, key, value)
     storage.save()
-    return jsonify(user_id.to_dict())
+    return jsonify(user_id.to_dict()), 200
