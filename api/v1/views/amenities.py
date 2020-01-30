@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-"""create flask view for state objects and default restful api actions"""
+"""
+create flask view for state objects and default restful api actions
+"""
 from flask import jsonify, request, abort
 from api.v1.views import app_views
 from models import storage
@@ -10,7 +12,9 @@ from models.amenity import Amenity
                  methods=['GET'],
                  strict_slashes=False)
 def get_all_amenities():
-    """ get all amenities """
+    """
+    get all amenities
+    """
 
     amenities = []
     amenvalue = storage.all("Amenity").values()
@@ -28,12 +32,11 @@ def get_amenity(amenity_id):
     """
     get amenity by id
     """
-    
-    amen = storage.get('Amenity', amenity_id)
-    if amen is None:
+    try:
+        amen = storage.get('Amenity', amenity_id)
+        return jsonify(amen.to_dict())
+    except Exception:
         abort(404)
-    return jsonify(amen.to_dict())
-    
 
 
 @app_views.route('/amenities/<amenity_id>',
@@ -73,7 +76,7 @@ def post_amenity():
     return jsonify(newamen.to_dict()), 201
 
 
-@app_views.route('/amenities/<amenitiy_id>',
+@app_views.route('/amenities/<amenity_id>',
                  methods=['PUT'],
                  strict_slashes=False)
 def puts_amenity(amenity_id):
