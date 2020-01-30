@@ -14,7 +14,7 @@ def get_all_users():
     users = []
     usercontent = storage.all("User").values()
 
-    for need in users:
+    for need in usercontent:
         users.append(need.to_dict())
     return jsonify(users)
 
@@ -59,17 +59,20 @@ def post_user():
 
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
-    if "email" not in request.get_json():
+    if "email" not in request.json():
         return jsonify({"error": "Missing email"}), 400
-    users = request.get_json()
+    if "password" not in request.json():
+        return jsonify({"error": "Missing password"}), 400
+    users = User(
+        email=request.get_json(
+            ["email"]), password=request.get_json(
+            ["password"]))
+    userattr = request.get_json().items()
+    for key, value in userattr:
+        setattr(users, key, value)
+    users.save()
 
-    if "password" not in request.get_json():
-        return jsonify({"error": "Missing name"}), 400
-
-    newuser = Amenity(**user)
-    newuser.save()
-
-    return jsonify(newamen.to_dict()), 201
+    return jsonify(users.to_dict()), 201
 
 
 @app_views.route('/users/<user_id>',
@@ -80,12 +83,12 @@ def puts_user(user_id):
     puts user
     """
     users = storage.get('User', user_id)
-    if amenity is None:
+    if users is None:
         abort(404)
     if request.json is False:
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(users, key, value)
-    city.save()
+    users.save()
     return jsonify(user_id.to_dict())
