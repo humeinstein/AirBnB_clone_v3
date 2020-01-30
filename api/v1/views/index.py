@@ -17,11 +17,11 @@ def stats():
     """ returns number of objects """
     dic = {}
     classes = {'amenities': 'Amenity',
-               'Cities': 'City',
-               'Places': 'Place',
-               'Reviews': 'Review',
-               'States': 'State',
-               'Users': 'User'}
+               'cities': 'City',
+               'places': 'Place',
+               'reviews': 'Review',
+               'states': 'State',
+               'users': 'User'}
     for k, v in classes.items():
         dic[k] = storage.count(v)
     return jsonify(dic)
