@@ -64,7 +64,7 @@ def post_place(city_id):
     if "user_id" not in request.json:
         abort(400)
         return jsonify({"error": "Missing user_id"})
-    if request.json is False:
+    if not request.get_json():
         abort(400)
         return jsonify({"error": "Not a JSON"})
     new = Place(**request.get_json())
@@ -80,10 +80,10 @@ def puts_place(place_id):
     place = storage.get('Place', place_id)
     if place is None:
         abort(404)
-    if not request.json:
+    if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
-        if key not in ['id', 'created_at', 'updated_at']:
+        if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
             setattr(place, key, value)
     place.save()
     return jsonify(place.to_dict())
