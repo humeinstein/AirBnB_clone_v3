@@ -26,11 +26,12 @@ def get_user_by_id(user_id):
     """
     get user by id
     """
-    try:
-        users = storage.get('User', user_id)
-        return jsonify(users.to_dict())
-    except Exception:
+
+    users = storage.get('User', user_id)
+    if users is None:
         abort(404)
+    else:
+        return jsonify(users.to_dict())
 
 
 @app_views.route('/users/<user_id>',
@@ -40,13 +41,14 @@ def delete_user_by_id(user_id):
     """
     delete user by id
     """
-    try:
-        users = storage.get('User', user_id)
+
+    users = storage.get('User', user_id)
+    if users is None:
+        abort(404)
+    else:
         storage.delete(users)
         storage.save()
         return jsonify({}), 200
-    except Exception:
-        abort(404)
 
 
 @app_views.route('/users',
@@ -59,19 +61,13 @@ def post_user():
 
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
-    if "email" not in request.json():
+    credentials = request.get_json()
+    if "email" not in credentials:
         return jsonify({"error": "Missing email"}), 400
-    if "password" not in request.json():
+    if "password" not in credentials:
         return jsonify({"error": "Missing password"}), 400
-    users = User(
-        email=request.get_json(
-            ["email"]), password=request.get_json(
-            ["password"]))
-    userattr = request.get_json().items()
-    for key, value in userattr:
-        setattr(users, key, value)
-    users.save()
-
+    newusers = User(**credentials)
+    newusers.save()
     return jsonify(users.to_dict()), 201
 
 
@@ -85,10 +81,10 @@ def puts_user(user_id):
     users = storage.get('User', user_id)
     if users is None:
         abort(404)
-    if request.json is False:
+    if not request.json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(users, key, value)
-    users.save()
+    storage.save()
     return jsonify(user_id.to_dict())
