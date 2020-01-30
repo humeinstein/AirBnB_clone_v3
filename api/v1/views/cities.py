@@ -30,7 +30,7 @@ def get_all_cities(state_id):
     city_list = []
     cities = storage.all('City').values()
     for city in cities:
-        if city.state_id == state_id:
+        if city.state_id == str(state_id):
             city_list.append(city.to_dict())
     return jsonify(city_list)
 
@@ -155,4 +155,4 @@ def puts_city(city_id):
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(city, key, value)
     city.save()
-    return jsonify(city.to_dict())
+    return jsonify(city.to_dict()), 200
