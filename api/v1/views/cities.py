@@ -53,11 +53,10 @@ def get_city(city_id):
     error:
         - abort404
     """
-    try:
-        city = storage.get('City', city_id)
-        return jsonify(city.to_dict())
-    except Exception:
+    city = storage.get('City', city_id)
+    if city is None:
         abort(404)
+    return jsonify(city.to_dict())
 
 
 @app_views.route('/cities/<city_id>',
