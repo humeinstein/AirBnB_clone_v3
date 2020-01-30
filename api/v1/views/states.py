@@ -16,7 +16,7 @@ def get_states():
          Returns jsonify(list)
     def:
     init empty list_of_states []
-    - check storage for instances using all.(all->'State'//.values('''only values'''):
+    - check storage for instances using all.values():
     -- append each instance to empty list_of_states using to_dict {}
     --- jsonify and return list
     """
@@ -92,17 +92,17 @@ def post_state():
 
     def:
     - check if json request ||return error400 || continue;
-    -- if name of state does not exit ||return error400 "not a json" || continue;
-    --- Make State(obj)
-    ---- Save instance
-    ----- jsonify and return new state as dict with success 201
+    - if name of state does not exit ||return error400 "not a json" || continue;
+    - Make State(obj)
+    - Save instance
+    - jsonify and return new state as dict with success 201
     """
     if 'name' not in request.json:
-        return jsonify({"error": "Missing Name"}), 400
-    if request.json is False:
+        return jsonify({"error": "Missing name"}), 400
+    if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     new = State(**request.get_json())
-    new.save()
+    storage.save()
     return jsonify(new.to_dict()), 201
 
 
@@ -129,10 +129,10 @@ def puts_state(state_id):
     state = storage.get('State', state_id)
     if state is None:
         abort(404)
-    if not request.json:
+    if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     for key, value in request.get_json().items():
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(state, key, value)
-    state.save()
+    storage.save()
     return jsonify(state.to_dict()), 200
