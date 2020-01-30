@@ -24,11 +24,11 @@ def get_reviews(place_id):
                  strict_slashes=False)
 def get_review(review_id):
     """ returns review object """
-    try:
-        review = storage.get('Review', review_id)
-        return jsonify(review.to_dict())
-    except Exception:
+    review = storage.get('Review', review_id)
+    if review is None:
         abort(404)
+    else:
+        return jsonify(review.to_dict())
 
 
 @app_views.route('/reviews/<review_id>',
@@ -36,14 +36,13 @@ def get_review(review_id):
                  strict_slashes=False)
 def delete_review_by_id(review_id):
     """ deletes a review object """
-    try:
-        review = storage.get('Review', review_id)
+    review = storage.get('Review', review_id)
+    if review is None:
+        abort(404)
+    else:
         storage.delete(review)
         storage.save()
-        storage.reload()
         return jsonify({}), 200
-    except Exception:
-        abort(404)
 
 
 @app_views.route('/places/<place_id>/reviews',
