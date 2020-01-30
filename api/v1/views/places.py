@@ -6,10 +6,10 @@ from models import storage
 from models.place import Place
 
 
-@app_views.route('/places',
+@app_views.route('cities/<city_id>/places',
                  methods=['GET'],
                  strict_slashes=False)
-def get_places():
+def get_places(city_id):
     """ return list of places """
     list_of_places = []
     for place in storage.all('Place').values():
@@ -44,14 +44,24 @@ def delete_place_by_id(place_id):
         abort(404)
 
 
-@app_views.route('/places',
+@app_views.route('cities/<city_id>/places',
                  methods=['POST'],
                  strict_slashes=False)
 def post_place():
     """ creates a place """
-    if 'name' not in request.json:
+    if "name" not in request.json:
         abort(400)
-        return jsonify({"error": "Missing Name"})
+        return jsonify({"error": "Missing name"})
+    test_city = storage.get('City', city_id)
+    if test_city is None:
+        abort(404)
+    test_user = storage.get('User', request.get_json['user_id'])
+    if test_user is None:
+        abort(404)
+        return jsonify({"error": "Missing user_id"})
+    if "user_id" not in request.json:
+        abort(400)
+        return jsonify({"error": "Missing user_id"})
     if request.json is False:
         abort(400)
         return jsonify({"error": "Not a JSON"})
