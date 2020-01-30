@@ -43,19 +43,18 @@ def get_state(state_id):
     error:
         - abort404
     """
-    try:
-        state = storage.get('State', state_id)
-        return jsonify(state.to_dict())
-    except Exception:
+    state = storage.get('State', state_id)
+    if state is None:
         abort(404)
+    else:
+        return jsonify(state.to_dict())
 
 
 @app_views.route('/states/<state_id>',
                  methods=['DELETE'],
                  strict_slashes=False)
 def delete_state_by_id(state_id):
-    """                                                                                         DELETE "api/v1/states/<state_id>"
-
+    """
     Deletes State obj by id:
         Returns emptry dict with 200 status code
     else raise 404 error
@@ -68,13 +67,13 @@ def delete_state_by_id(state_id):
     erorr:
         - abort404
     """
-    try:
-        state = storage.get('State', state_id)
+    state = storage.get('State', state_id)
+    if state is None:
+        abort(404)
+    else:
         storage.delete(state)
         storage.save()
         return jsonify({}), 200
-    except Exception:
-        abort(404)
 
 
 @app_views.route('/states',
@@ -92,12 +91,12 @@ def post_state():
 
     def:
     - check if json request ||return error400 || continue;
-    - if name of state does not exit ||return error400 "not a json" || continue;
+    - if name of state does not exit ||return error400 "not a json"
     - Make State(obj)
     - Save instance
     - jsonify and return new state as dict with success 201
     """
-    if 'name' not in request.json:
+    if 'name' not in request.get_json():
         return jsonify({"error": "Missing name"}), 400
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
