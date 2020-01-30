@@ -24,7 +24,7 @@ def get_all_amenities():
 @app_views.route('/amemities/<amenity_id>',
                  methods=['GET'],
                  strict_slashes=False)
-def get_amenity(city_id):
+def get_amenity(amenity_id):
     """
     get amenity by id
     """
@@ -68,7 +68,7 @@ def post_amenity():
         return jsonify({"error": "Missing name"}), 400
 
     newamen = Amenity(**amenity)
-    newcity.save()
+    newamen.save()
 
     return jsonify(newamen.to_dict()), 201
 
